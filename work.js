@@ -27,15 +27,15 @@ async function sendMessage(channel, messageContent) {
 }
 
 // Test function for initial debugging
-// async function test(client) {
-//   const channelId = '1317534046624022638'; // Example channel ID
-//   try {
-//     const channel = await client.channels.fetch(channelId);
-//     console.log(`Test successful for channel: ${channel.name}`);
-//   } catch (error) {
-//     console.error(`Test failed: ${error.message}`);
-//   }
-// }
+async function test(client) {
+  const channelId = '1317534046624022638'; // Example channel ID
+  try {
+    const channel = await client.channels.fetch(channelId);
+    console.log(`Test successful for channel: ${channel.name}`);
+  } catch (error) {
+    console.error(`Test failed: ${error.message}`);
+  }
+}
 
 // Core function to start the bot for each account
 async function startClient(token, accountName) {
