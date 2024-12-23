@@ -1,5 +1,6 @@
 const Discord = require("discord.js-selfbot-v13");
 require('dotenv').config();
+require('./keep_alive.js');
 
 // Sleep function to create random delays
 async function sleep(min, max) {
