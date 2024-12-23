@@ -52,14 +52,15 @@ async function startClient(token, accountName) {
       const channel = await client.channels.fetch(channelId);
 
       // Initial test to validate channel
-      await test(client);
+      // await test(client);
 
       async function loop() {
-        console.log(`[${accountName}] Running loop sequence.`);
+        // console.log(`[${accountName}] Running loop sequence.`);
         await sendSlashCommand(channel, botid, 'work');
         await sleep(1, 5);
         await sendSlashCommand(channel, botid, 'deposit', ['all']);
         await sleep(30, 35);
+        await loop()
       }
 
       // Start the workflow
