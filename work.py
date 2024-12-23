@@ -67,7 +67,7 @@ async function startClient(token, accountName) {
 
 // Add tokens and account names to this array
 const accounts = [
-  { token: process.env.KID, name: 'KID' },
+  // { token: process.env.KID, name: 'KID' },
   { token: process.env.TEEN, name: 'Itz_CXYP' },
   { token: process.env.CRYING, name: 'CRYING' }, 
   { token: process.env.MARK, name: 'MARK' },
