@@ -21,20 +21,9 @@ async function sendSlashCommand(channel, commandId, commandName, args) {
 async function sendMessage(channel, messageContent) {
   try {
     await channel.send(messageContent);
-    console.log(`Message sent: ${messageContent}`);
+    // console.log(`Message sent: ${messageContent}`);
   } catch (error) {
     console.error(`Error sending message: ${error.message}`);
-  }
-}
-
-// Test function for initial debugging
-async function test(client) {
-  const channelId = '1317534046624022638'; // Example channel ID
-  try {
-    const channel = await client.channels.fetch(channelId);
-    console.log(`Test successful for channel: ${channel.name}`);
-  } catch (error) {
-    console.error(`Test failed: ${error.message}`);
   }
 }
 
@@ -42,29 +31,58 @@ async function test(client) {
 async function startClient(token, accountName) {
   const client = new Discord.Client({ checkUpdate: false });
 
+  // Control flag for loop
+  let isRunning = false;
+
   client.on('ready', async () => {
     console.log(`[${accountName}] Logged in as ${client.user.tag}!`);
 
-    const channelId = '1317534046624022638'; // Channel ID where commands will be sent
+    const automationChannelId = '1317534046624022638'; // Channel ID where automation commands will be sent
+    const controlChannelId = '943030564821286952'; // Channel ID for control messages
     const botid = '356950275044671499'; // Example bot ID
+    const userId = '745874898525880427'; // ID of the user controlling the bot
 
     try {
-      const channel = await client.channels.fetch(channelId);
-
-      // Initial test to validate channel
-      // await test(client);
+      const automationChannel = await client.channels.fetch(automationChannelId);
+      const controlChannel = await client.channels.fetch(controlChannelId);
 
       async function loop() {
-        // console.log(`[${accountName}] Running loop sequence.`);
-        await sendSlashCommand(channel, botid, 'work');
+        if (!isRunning) return; // Stop loop if flag is false
+
+        await sendSlashCommand(automationChannel, botid, 'work');
         await sleep(1, 5);
-        await sendSlashCommand(channel, botid, 'deposit', ['all']);
+        await sendSlashCommand(automationChannel, botid, 'deposit', ['all']);
         await sleep(30, 35);
-        await loop()
+
+        await loop(); // Continue loop if not stopped
       }
 
-      // Start the workflow
-      await loop();
+      // Listen for messages to start, stop, or use the .say command
+      client.on('messageCreate', async (message) => {
+        if (message.author.id !== userId) return; // Ignore messages from other users
+
+        const content = message.content.trim();
+
+        if (content === '.start') {
+          if (!isRunning) {
+            isRunning = true;
+            sendMessage(controlChannel, "Automation started! 🚀");
+            loop();
+          } else {
+            sendMessage(controlChannel, "Automation is already running!");
+          }
+        } else if (content === '.stop') {
+          if (isRunning) {
+            isRunning = false;
+            sendMessage(controlChannel, "Automation paused. 🛑");
+          } else {
+            sendMessage(controlChannel, "Automation is not running.");
+          }
+        } else if (content.startsWith('.say ')) {
+          const text = content.slice(5); // Extract the text after ".say "
+          sendMessage(automationChannel, text); // Send the text to the automation channel
+        }
+      });
 
     } catch (error) {
       console.error(`[${accountName}] Error in automation: ${error.message}`);
